@@ -32,19 +32,19 @@ const routes = [
   {
     path: "/tools",
     component: Layout,
-    meta: { title: "即用工具", icon: "dashboard" },
+    meta: { title: "即用工具", icon: "tools" },
     children: [
       {
         path: "barcode",
         name: "Barcode",
         component: () => import("@/views/tools/barcode.vue"),
-        meta: { title: "条形码生成", icon: "dashboard" },
+        meta: { title: "条形码生成", icon: "barcode" },
       },
       {
         path: "thumbUp",
         name: "ThumbUp",
         component: () => import("@/views/tools/thumbUp.vue"),
-        meta: { title: "效果图上传", icon: "dashboard" },
+        meta: { title: "效果图上传", icon: "thumbUp" },
       },
     ],
   },

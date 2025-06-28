@@ -56,5 +56,10 @@ const classObj = computed(() => {
       flex: 1;
     }
   }
+  &.hideSidebar {
+    .sidebar-container {
+      width: 54px;
+    }
+  }
 }
 </style>

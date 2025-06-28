@@ -62,7 +62,7 @@ export default defineConfig({
     proxy: {
       "/tools": {
         target: "http://192.168.0.66:3000",
-        // target: "https://api.shopmell.com/erp/dealer",
+        // target: "https://api.iocsc.xyz",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/tools/, ""),
       },
@@ -73,7 +73,7 @@ export default defineConfig({
     terserOptions: {
       compress: {
         //生产环境时移除console
-        drop_console: true,
+        drop_console: false,
         drop_debugger: true,
       },
     },

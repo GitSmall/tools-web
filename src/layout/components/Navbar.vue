@@ -1,6 +1,9 @@
 <template>
   <div class="navbar">
-    <p class="title">Tool Scripts</p>
+    <p :class="['title', { close: !sidebar.opened }]">
+      <span>Tool Scripts</span>
+      <img src="/logo.svg" alt="" />
+    </p>
 
     <hamburger
       :is-active="sidebar.opened"
@@ -49,7 +52,7 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 
 const sidebar = computed(() => appStore.sidebar);
-const name = computed(() => userStore.name);
+const name = computed(() => userStore.info.nickname || userStore.info.username);
 const toggleSideBar = () => {
   appStore.toggleSidebar();
 };
@@ -94,33 +97,21 @@ const logout = async () => {
     font-weight: Bold;
     color: #000;
     position: relative;
-    // font-family: Verdana, Geneva, STCaiyun, sans-serif;
-    // background-image: -webkit-linear-gradient(#d5cabd 0%, #717597 100%);
-    // -webkit-background-clip: text;
-    // -webkit-text-fill-color: transparent;
-    // -webkit-filter: drop-shadow(2px 2px 15px #b052b0);
-    // cursor: pointer;
-    // transition: all 1s;
+    cursor: pointer;
+    img {
+      display: none;
+    }
     &:hover {
-      // background-image: -webkit-linear-gradient(
-      //   #81ede2 0%,
-      //   #000 50%,
-      //   #6db0f3 100%
-      // );
-      // -webkit-background-clip: text;
-      // -webkit-text-fill-color: transparent;
-      // -webkit-filter: drop-shadow(2px 2px 15px #5ff3d0);
-      // animation: shine 1s linear infinite;
-      &::before {
-        content: attr(data-text);
-        position: absolute;
-        transform: rotateX(180deg);
-        transform-origin: bottom;
-        line-height: 52px;
-        background: linear-gradient(0deg, #000 0, transparent 80%);
-        -webkit-background-clip: text;
-        color: transparent;
-        opacity: 0.5;
+      opacity: 0.5;
+    }
+    &.close {
+      width: 60px;
+      span {
+        display: none;
+      }
+      img {
+        display: inline-block;
+        width: 20px;
       }
     }
   }

@@ -6,3 +6,75 @@
 .el-sub-menu__title:hover {
   background-color: #f1f1f1 !important;
 }
+
+.sidebar-container {
+  .el-menu {
+    width: 100%;
+  }
+  .svg-icon {
+    margin-right: 12px;
+  }
+}
+// .hideSidebar {
+//   .sidebar-container {
+//     .svg-icon {
+//       margin-right: 0;
+//     }
+//   }
+// }
+.hideSidebar {
+  .sidebar-container {
+    width: 54px !important;
+  }
+
+  .submenu-title-noDropdown {
+    padding: 0 !important;
+    position: relative;
+
+    .el-tooltip__trigger {
+      padding: 0 !important;
+
+      .svg-icon {
+        margin-left: 20px;
+      }
+    }
+  }
+
+  .el-sub-menu {
+    overflow: hidden;
+
+    & > .el-sub-menu__title {
+      padding: 0 !important;
+
+      .svg-icon {
+        margin-left: 20px;
+      }
+
+      .el-sub-menu__icon-arrow {
+        display: none;
+      }
+    }
+  }
+
+  .el-menu--collapse {
+    .el-sub-menu {
+      & > .el-sub-menu__title {
+        & > span {
+          height: 0;
+          width: 0;
+          overflow: hidden;
+          visibility: hidden;
+          display: inline-block;
+        }
+      }
+    }
+  }
+}
+
+.el-menu--vertical {
+  & > .el-menu {
+    .svg-icon {
+      margin-right: 12px;
+    }
+  }
+}

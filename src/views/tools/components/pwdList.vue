@@ -27,7 +27,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="createdAt" label="创建时间" width="170" />
-      <el-table-column prop="createdAt" label="使用时间" width="170" />
+      <el-table-column prop="updatedAt" label="使用时间" width="170" />
     </el-table>
     <Pagination
       :isFixed="false"

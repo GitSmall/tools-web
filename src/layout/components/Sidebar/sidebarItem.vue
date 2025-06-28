@@ -17,9 +17,7 @@
             :title="onlyOneChild.meta.title"
           /> -->
           <SvgIcon :icon-class="onlyOneChild.meta.icon" />
-          <template #title>
-            {{ onlyOneChild.meta.title }}
-          </template>
+          <template #title> {{ onlyOneChild.meta.title }} </template>
         </el-menu-item>
       </AppLink>
     </template>
@@ -31,11 +29,6 @@
       teleported
     >
       <template #title>
-        <!-- <Item
-          v-if="item.meta"
-          :icon="item.meta && item.meta.icon"
-          :title="item.meta.title"
-        /> -->
         <template v-if="item.meta">
           <SvgIcon
             v-if="item.meta.icon || (item.meta && item.meta.icon)"

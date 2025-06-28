@@ -68,7 +68,8 @@ service.interceptors.response.use(
       }
       return Promise.reject(new Error(res.message || "Error"));
     } else {
-      if (res.headers["content-disposition"]) {
+      console.log("res.headers", res.headers);
+      if (res.headers["content-type"].indexOf("application/json") == -1) {
         return res;
       }
       if (res.data.code !== 200) {
