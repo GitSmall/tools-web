@@ -33,29 +33,54 @@
           </div>
         </el-upload>
       </el-form-item>
-      <el-form-item v-if="ruleForm.type == 1" label="数据列名称" prop="name">
-        <el-row class="w-full">
-          <el-col :span="16">
-            <el-input
-              v-model="ruleForm.name"
-              placeholder="请输入数据列名称"
-            ></el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-popover placement="right" :width="400">
-              <template #reference>
-                <i-ep-questionFilled
-                  class="mt-[7px] ml-[10px]"
-                ></i-ep-questionFilled>
-              </template>
-              <p class="pb-[10px]">
-                Excel中条形码数据列的标题名称。例如下图中的<b>Tracking</b>
-              </p>
-              <img src="../../assets/example.png" class="w-[400px]" />
-            </el-popover>
-          </el-col>
-        </el-row>
-      </el-form-item>
+      <template v-if="ruleForm.type == 1">
+        <el-form-item label="数据列名称" prop="name">
+          <el-row class="w-full">
+            <el-col :span="16">
+              <el-input
+                v-model="ruleForm.name"
+                placeholder="请输入数据列名称"
+              ></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-popover placement="right" :width="400">
+                <template #reference>
+                  <i-ep-questionFilled
+                    class="mt-[7px] ml-[10px]"
+                  ></i-ep-questionFilled>
+                </template>
+                <p class="pb-[10px]">
+                  Excel中条形码数据列的标题名称。例如下图中的<b>Tracking</b>
+                </p>
+                <img src="../../assets/example.png" class="w-[400px]" />
+              </el-popover>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="单PDF容量" prop="chunkSize">
+          <el-row class="w-full">
+            <el-col :span="8">
+              <el-input
+                v-model="ruleForm.chunkSize"
+                placeholder="请输入单个PDF容量"
+              ></el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-popover placement="right" :width="400">
+                <template #reference>
+                  <i-ep-questionFilled
+                    class="mt-[7px] ml-[10px]"
+                  ></i-ep-questionFilled>
+                </template>
+                <p class="pb-[10px]">
+                  单PDF容量默认为500，假如Excel文件中的数据量大于500(或设定值),
+                  将会输出多个PDF文件
+                </p>
+              </el-popover>
+            </el-col>
+          </el-row>
+        </el-form-item>
+      </template>
       <el-form-item v-if="ruleForm.type == 2" label="条码内容" prop="text">
         <el-input
           v-model="ruleForm.text"
@@ -82,6 +107,7 @@ const ruleForm = reactive({
   type: 1,
   file: null,
   name: "Tracking",
+  chunkSize: 500,
   width: 2, // 条码线条宽度，增加清晰度
   height: 100, // 条码高度
   margin: 20, // 边距
@@ -103,6 +129,10 @@ const rules = reactive({
       trigger: "blur",
     },
   ],
+  chunkSize: [
+    { required: true, message: "请输入整数" },
+    { type: "number", message: "单PDF容量必须是整数" },
+  ],
 });
 const loading = ref(false);
 const formRef = ref(null);
@@ -116,7 +146,7 @@ const quickCreate = async () => {
     return;
   }
   console.log("---");
-  const { type, file, name, text, ...other } = ruleForm;
+  const { type, file, name, text, chunkSize } = ruleForm;
   if (type == 1) {
     if (!file) {
       return ElMessage.warning("请上传文件");
@@ -124,11 +154,14 @@ const quickCreate = async () => {
     const params = new FormData();
     params.append("file", file);
     params.append("name", name);
+    params.append("chunkSize", chunkSize || 500);
     loading.value = true;
     createByExcel(params)
       .then((res) => {
         console.log(res);
-        downloadByBlob(res);
+        if (res.status == 200 && res.data) {
+          downloadByBlob(res);
+        }
       })
       .finally(() => {
         loading.value = false;
@@ -139,7 +172,9 @@ const quickCreate = async () => {
     createByText({ text })
       .then((res) => {
         console.log(res);
-        downloadByBlob(res);
+        if (res.status == 200 && res.data) {
+          downloadByBlob(res);
+        }
       })
       .finally(() => {
         loading.value = false;

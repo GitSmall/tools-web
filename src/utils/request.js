@@ -42,18 +42,20 @@ service.interceptors.response.use(
   /**
    * 通过HTTP状态码来判断请求状态
    */
-  (response) => {
+  async (response) => {
     const res = response;
-    console.log("--", res);
+    let data = res.data;
+    console.log("--res", res);
+    console.log("--data", data);
     // 如果请求响应码不为200，请求出错
     if (res.status !== 200) {
       ElMessage.error({
-        message: res.data.message || "request occur Error",
+        message: data.message || "request occur Error",
         duration: 5 * 1000,
       });
 
       // 具体错误响应码具体处理，现暂处理500错误
-      if (res.code === 500) {
+      if (res.status === 500) {
         // to re-login
         // ElMessageBox.confirm('服务器请求异常，您可以点击取消以停留在此页面，或重新登录', '服务器异常', {
         ElMessageBox.confirm(res.message, "服务器异常", {
@@ -72,10 +74,16 @@ service.interceptors.response.use(
       if (res.headers["content-type"].indexOf("application/json") == -1) {
         return res;
       }
-      if (res.data.code !== 200) {
-        if (res.data.code === 1002 || res.data.code === 1010) {
+      console.log(data instanceof Blob);
+      if (data instanceof Blob) {
+        const text = await data.text();
+        data = JSON.parse(text);
+        console.log("data", data);
+      }
+      if (data.code !== 200) {
+        if (data.code === 1002 || data.code === 1010) {
           ElMessage.error({
-            message: res.data.message || "服务器异常",
+            message: data.message || "服务器异常",
             duration: 3 * 1000,
           });
           setTimeout(() => {
@@ -83,7 +91,7 @@ service.interceptors.response.use(
               location.reload();
             });
           }, 1000);
-        } else if (res.data.code === 1001) {
+        } else if (data.code === 1001) {
           ElMessage.error({
             message: "参数错误",
             duration: 3 * 1000,
@@ -91,19 +99,20 @@ service.interceptors.response.use(
         } else {
           ElMessage.error({
             message:
-              res.data.errors.length > 0
-                ? res.data.errors[0]
-                : res.data.message || "request occur Error",
+              data.errors.length > 0
+                ? data.errors[0]
+                : data.message || "request occur Error",
             duration: 3 * 1000,
           });
         }
-        return res.data;
+        return data;
       } else {
-        return res.data;
+        return data;
       }
     }
   },
   (error) => {
+    console.log(error);
     ElMessage.error({ message: error.message, duration: 5 * 1000 });
     return Promise.reject(error);
   }
