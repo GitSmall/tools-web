@@ -17,6 +17,8 @@ export const downloadByBlob = async (res) => {
         contentDisposition.split("filename=")[1];
     } else if (contentType.includes("application/pdf")) {
       filename = "download.pdf";
+    } else if (contentType.includes("application/zip")) {
+      filename = "download.zip";
     }
 
     const blob = new Blob([res.data]);

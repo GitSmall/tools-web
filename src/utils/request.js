@@ -7,7 +7,7 @@ let userStore = null;
 const service = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API, // 请求路径
   // withCredentials: true, // 当跨域请求时发送cookie
-  timeout: 300000, // 请求超时时间
+  timeout: 1800000, // 请求超时时间
 });
 
 // 请求拦截器
