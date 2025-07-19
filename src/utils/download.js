@@ -1,6 +1,6 @@
 import { ElMessage } from "element-plus";
 
-export const downloadByBlob = async (res) => {
+export const downloadByBlob = async (res, isDecode = false) => {
   // 下载blob数据
   if (JSON.stringify(res) !== "{}") {
     ElMessage.success("文件已开始下载");
@@ -25,7 +25,12 @@ export const downloadByBlob = async (res) => {
     const downloadElement = document.createElement("a");
     const href = window.URL.createObjectURL(blob); // 创建下载的链接
     downloadElement.href = href;
-    downloadElement.download = filename; // 下载后文件名
+    console.log(filename);
+    console.log(decodeURIComponent(filename));
+    console.log("---", isDecode ? decodeURIComponent(filename) : filename);
+    downloadElement.download = isDecode
+      ? decodeURIComponent(filename)
+      : filename; // 下载后文件名
     document.body.appendChild(downloadElement);
     downloadElement.click(); // 点击下载
     document.body.removeChild(downloadElement); // 下载完成移除元素

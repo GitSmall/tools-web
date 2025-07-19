@@ -4,7 +4,7 @@
       <h2>常用工具</h2>
     </div>
     <div class="desktop-main-mid">
-      <div class="desktop-card" style="margin-right: 30px">
+      <div class="desktop-card">
         <img src="~@/assets/home/desk.webp" style="width: 100%; height: 100%" />
         <div class="img-title">条形码生成</div>
         <div class="desktop-card__content" @click="jumpRoute('/tools/barcode')">
@@ -14,13 +14,31 @@
           </p>
         </div>
       </div>
-      <div class="desktop-card" style="margin-right: 30px">
+      <div class="desktop-card">
         <img src="~@/assets/home/desk2.jpg" style="width: 100%; height: 100%" />
         <div class="img-title">效果图上传</div>
         <div class="desktop-card__content" @click="jumpRoute('/tools/thumbUp')">
           <p class="desktop-card__title">效果图上传</p>
           <p class="desktop-card__description">
             上传压缩包，批量处理里层文件中的效果图片。输入Excel文件
+          </p>
+        </div>
+      </div>
+      <div class="desktop-card">
+        <img src="~@/assets/home/desk3.jpg" style="width: 100%; height: 100%" />
+        <div class="img-title">字符串处理</div>
+        <div class="desktop-card__content" @click="jumpRoute('/tools/string')">
+          <p class="desktop-card__title">字符串处理</p>
+          <p class="desktop-card__description">批量处理字符串，添加前缀后缀</p>
+        </div>
+      </div>
+      <div class="desktop-card">
+        <img src="~@/assets/home/desk4.jpg" style="width: 100%; height: 100%" />
+        <div class="img-title">文件名替换</div>
+        <div class="desktop-card__content" @click="jumpRoute('/tools/replace')">
+          <p class="desktop-card__title">文件名替换</p>
+          <p class="desktop-card__description">
+            上传压缩包，根据Excel文件中的数据，修改同目录下文件的名称
           </p>
         </div>
       </div>
@@ -45,13 +63,15 @@ const jumpRoute = (path) => {
   text-align: left;
 }
 .desktop-main-mid {
-  width: auto;
+  display: flex;
+  gap: 30px;
+  width: 100%;
   height: 200px;
 }
 
 .desktop-card {
   position: relative;
-  width: 315px;
+  width: 25%;
   height: 170px;
   border-radius: 10px;
   display: flex;

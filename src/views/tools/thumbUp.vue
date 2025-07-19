@@ -34,7 +34,6 @@
           <i-ep-uploadFilled
             class="el-icon el-icon--upload"
           ></i-ep-uploadFilled>
-          <!-- <el-icon class="el-icon--"><upload-filled /></el-icon> -->
           <div class="el-upload__text">
             将zip文件拖到此处，或<em>点击上传</em>
           </div>
@@ -53,10 +52,10 @@
         @click="createPWD"
         >生成密钥</el-button
       >
-      <el-button type="primary" :loading="loading" @click="startUpload"
-        >{{ loading ? "正在上传" : "立即上传"
-        }}{{ fileList.length ? `(数量: ${fileList.length})` : "" }}</el-button
-      >
+      <el-button type="primary" :loading="loading" @click="startUpload">
+        {{ loading ? "正在上传" : "立即上传"
+        }}{{ fileList.length ? `(数量: ${fileList.length})` : "" }}
+      </el-button>
     </el-card>
     <el-card class="flex-1 h-full">
       <template #header>
@@ -96,24 +95,57 @@
           :image-size="100"
           description="暂无上传结果，请选择文件并上传"
         />
-        <p v-else class="text-[13px]">
-          正在上传，预计时间较长请勿关闭该页面...
-        </p>
+        <div v-else class="text-[13px]">
+          正在上传并处理，预计时间较长请勿关闭该页面...
+          <div class="flex justify-center mt-[10px] gap-x-[60px]">
+            <el-progress
+              v-if="uploadProgress"
+              type="dashboard"
+              :percentage="
+                (uploadProgress.uploadedChunks / uploadProgress.totalChunks) *
+                100
+              "
+              :color="colors"
+            >
+              <template #default="{ percentage }">
+                <span class="progress-value">{{ percentage.toFixed(1) }}%</span>
+                <span class="progress-label">发送进度</span>
+              </template>
+            </el-progress>
+            <el-progress
+              type="dashboard"
+              :percentage="percentage"
+              :color="colors"
+            >
+              <template #default="{ percentage }">
+                <span class="progress-value">{{ percentage.toFixed(1) }}%</span>
+                <span class="progress-label">处理进度</span>
+              </template>
+            </el-progress>
+          </div>
+        </div>
       </template>
     </el-card>
 
-    <!-- 密钥列表 -->
     <PwdList ref="pwdListRef" />
-
-    <!-- 上传记录列表 -->
     <LogList ref="logListRef" />
+    <!--  -->
+    <div v-if="env == 'production'" class="mask">
+      图片上传暂不可用，请联系管理员使用本地部署版本
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ElMessage, ElMessageBox, ElLoading } from "element-plus";
 import { ref, computed } from "vue";
-import { thumbUpload, createSecretThumb, secretThumbPage } from "@/api/tools";
+import {
+  thumbUpload,
+  createSecretThumb,
+  secretThumbPage,
+  thumbUploadTask,
+  thumbUploadChunk,
+} from "@/api/tools";
 import { useUserStore } from "@/store/user";
 import LogList from "./components/logList.vue";
 import PwdList from "./components/pwdList.vue";
@@ -127,8 +159,18 @@ const loading = ref(false);
 const logListRef = ref(null);
 const tableData = ref([]);
 const excelLink = ref("");
+const taskId = ref("");
+const percentage = ref(0);
+const uploadProgress = ref(null);
+const env = import.meta.env.VITE_NODE_ENV;
 
-// 获取user.role, 判断是否是管理员
+const colors = [
+  { color: "#e6a23c", percentage: 40 },
+  { color: "#6f7ad3", percentage: 60 },
+  { color: "#1989fa", percentage: 80 },
+  { color: "#5cb87a", percentage: 100 },
+];
+
 const isAdmin = computed(() => {
   return userStore.info.role == 100;
 });
@@ -139,18 +181,111 @@ const fileChange = (file) => {
   ) {
     return;
   } else {
-    if (fileList.value.length < 6) {
+    if (fileList.value.length < 3) {
       fileList.value.push(file);
     } else {
-      ElMessage.warning("最多支持同时上传6个文件");
+      ElMessage.warning("最多支持同时上传3个文件");
     }
   }
 };
-const deleteItem = (index) => {
-  fileList.value.splice(index, 1);
+
+const uploadLargeFile = async (files, secretKey, taskId) => {
+  const chunkSize = 200 * 1024 * 1024;
+  const chunkTasks = [];
+
+  files.forEach((file) => {
+    const chunkCount = Math.ceil(file.size / chunkSize);
+    chunkTasks.push({ file, chunkCount });
+  });
+
+  console.log(
+    `开始分块上传: ${files.length} 个文件, 总分块数: ${uploadProgress.value.totalChunks}, taskId: ${taskId}`
+  );
+
+  const uploadPromises = [];
+  for (const { file, chunkCount } of chunkTasks) {
+    for (let i = 0; i < chunkCount; i++) {
+      const start = i * chunkSize;
+      const end = Math.min(start + chunkSize, file.size);
+      const chunk = file.raw.slice(start, end);
+      const formData = new FormData();
+      formData.append("chunk", chunk, `${file.name}-chunk-${i}`);
+      formData.append("taskId", taskId);
+      formData.append("index", `${file.name}-${i}`);
+      formData.append("totalChunks", uploadProgress.value.totalChunks);
+      formData.append("originalName", file.name);
+      formData.append("key", secretKey);
+
+      console.log(`发送 FormData (文件: ${file.name}, 分块: ${i}):`);
+      for (const [key, value] of formData.entries()) {
+        console.log(
+          `  ${key}: ${typeof value === "string" ? value : "[Binary]"}`
+        );
+      }
+
+      // uploadPromises.push(
+      try {
+        const result = await thumbUploadChunk(formData);
+        // .then((result) => {
+        console.log(
+          `分块 ${file.name}-${i + 1}/${chunkCount} 上传完成`,
+          result
+        );
+        if (result.code === 200) {
+          uploadProgress.value.uploadedChunks++;
+        } else {
+          throw new Error(result.message);
+        }
+        // })
+        // .catch((err) =>
+      } catch (err) {
+        console.error(`分块 ${file.name}-${i + 1} 上传失败:`, err);
+        throw err;
+      }
+      // })
+      // );
+    }
+  }
+
+  // await Promise.all(uploadPromises);
 };
+
+const generateUUID = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
+const checkStatus = async (taskIdValue) => {
+  const response = await thumbUploadTask(taskIdValue);
+  const { status, results: dataRes, progress, error } = response.data;
+  percentage.value = progress;
+  if (status === "completed") {
+    setTimeout(() => {
+      loading.value = false;
+      fileList.value = [];
+      taskId.value = "";
+      uploadProgress.value = null;
+      const { excelUrl, results } = dataRes;
+      excelLink.value = excelUrl;
+      tableData.value = results;
+    }, 1000);
+  } else if (status === "failed") {
+    console.error("上传失败:", error);
+    ElMessage.error("上传失败: " + error);
+    loading.value = false;
+    fileList.value = [];
+    taskId.value = "";
+    uploadProgress.value = null;
+  } else {
+    setTimeout(() => checkStatus(taskIdValue), 5000);
+  }
+};
+
 const startUpload = () => {
-  if (fileList.value.length == 0) {
+  if (fileList.value.length === 0) {
     return ElMessage.warning("请选择zip文件");
   }
   ElMessageBox.prompt("请输入管理员提供的随机密钥", "验证", {
@@ -158,27 +293,72 @@ const startUpload = () => {
     cancelButtonText: "取消",
     inputPattern: /^[a-zA-Z0-9]+$/,
     inputErrorMessage: "格式错误",
-  }).then(({ value }) => {
-    const formData = new FormData();
-    fileList.value.forEach((file) => formData.append("zipFiles", file.raw));
-    formData.append("key", value);
-    excelLink.value = "";
-    tableData.value = [];
-    loading.value = true;
-    thumbUpload(formData)
-      .then((res) => {
-        console.log(res);
-        if (res.code == 200) {
-          fileList.value = [];
-          const { excelUrl, results } = res.data.data;
-          excelLink.value = excelUrl;
-          tableData.value = results;
-        }
-      })
-      .finally(() => {
-        loading.value = false;
+  })
+    .then(async ({ value }) => {
+      excelLink.value = "";
+      tableData.value = [];
+      loading.value = true;
+      percentage.value = 0;
+
+      const taskIdStr = generateUUID();
+      taskId.value = taskIdStr;
+
+      const largeFiles = fileList.value;
+      // .filter(
+      //   (file) => file.size > 500 * 1024 * 1024
+      // );
+      const smallFiles = [];
+      // fileList.value.filter(
+      //   (file) => file.size <= 500 * 1024 * 1024
+      // );
+
+      // 初始化上传进度
+      let totalChunks = 0;
+      largeFiles.forEach((file) => {
+        totalChunks += Math.ceil(file.size / (200 * 1024 * 1024));
       });
-  });
+      if (smallFiles.length > 0) {
+        totalChunks += 1; // 小文件作为一个整体上传
+      }
+      uploadProgress.value = { uploadedChunks: 0, totalChunks };
+
+      try {
+        // 处理小文件
+        if (smallFiles.length > 0) {
+          const formData = new FormData();
+          smallFiles.forEach((file) => formData.append("zipFiles", file.raw));
+          formData.append("key", value);
+          formData.append("taskId", taskIdStr); // 传递 taskId
+          const res = await thumbUpload(formData);
+          console.log("小文件上传结果:", res);
+          if (res.code === 200) {
+            uploadProgress.value.uploadedChunks++;
+          } else {
+            throw new Error(res.message);
+          }
+        }
+
+        // 处理大文件
+        if (largeFiles.length > 0) {
+          await uploadLargeFile(largeFiles, value, taskIdStr);
+        }
+
+        console.log("所有文件上传完成，开始轮询状态");
+        await checkStatus(taskIdStr);
+      } catch (err) {
+        ElMessage.error("上传失败: " + err.message);
+        loading.value = false;
+        uploadProgress.value = null;
+        taskId.value = "";
+      }
+    })
+    .catch(() => {
+      loading.value = false;
+    });
+};
+
+const deleteItem = (index) => {
+  fileList.value.splice(index, 1);
 };
 
 const showLogs = () => {
@@ -221,9 +401,7 @@ const createPWD = () => {
 
 const showUsablePwd = () => {
   createLoading.value = true;
-  secretThumbPage({
-    status: 0,
-  })
+  secretThumbPage({ status: 0 })
     .then((res) => {
       console.log(res);
       const { code, data } = res;
@@ -259,6 +437,7 @@ const showUsablePwd = () => {
     });
 };
 </script>
+
 <style scoped lang="scss">
 :deep(.el-upload-dragger) {
   padding: 20px 10px;
@@ -284,5 +463,30 @@ const showUsablePwd = () => {
       }
     }
   }
+}
+.el-progress {
+  :deep(.progress-value) {
+    display: block;
+    margin-top: 10px;
+    font-size: 28px;
+  }
+  :deep(.progress-label) {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+  }
+}
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  background-color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
 }
 </style>

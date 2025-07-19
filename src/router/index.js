@@ -41,10 +41,22 @@ const routes = [
         meta: { title: "条形码生成", icon: "barcode" },
       },
       {
+        path: "string",
+        name: "String",
+        component: () => import("@/views/tools/string.vue"),
+        meta: { title: "字符串处理", icon: "strReplace" },
+      },
+      {
         path: "thumbUp",
         name: "ThumbUp",
         component: () => import("@/views/tools/thumbUp.vue"),
         meta: { title: "效果图上传", icon: "thumbUp" },
+      },
+      {
+        path: "replace",
+        name: "Replace",
+        component: () => import("@/views/tools/replace.vue"),
+        meta: { title: "文件名替换", icon: "rename" },
       },
     ],
   },

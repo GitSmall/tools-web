@@ -1,6 +1,6 @@
 <template>
   <div class="navbar">
-    <p :class="['title', { close: !sidebar.opened }]">
+    <p :class="['title', { close: !sidebar.opened }]" @click="toHome">
       <span>Tool Scripts</span>
       <img src="/logo.svg" alt="" />
     </p>
@@ -14,7 +14,6 @@
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
-      <ScreenFull id="screenfull" class="right-menu-item hover-effect" />
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img src="@/assets/avatar.png" class="user-avatar" />
@@ -44,7 +43,6 @@ import { useAppStore } from "@/store/app";
 import { useUserStore } from "@/store/user";
 import Breadcrumb from "@/components/Breadcrumb/index.vue";
 import Hamburger from "@/components/Hamburger/index.vue";
-import ScreenFull from "@/components/Screenfull/index.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -55,6 +53,9 @@ const sidebar = computed(() => appStore.sidebar);
 const name = computed(() => userStore.info.nickname || userStore.info.username);
 const toggleSideBar = () => {
   appStore.toggleSidebar();
+};
+const toHome = () => {
+  router.push(`/`);
 };
 const logout = async () => {
   await userStore.logout();
@@ -132,24 +133,6 @@ const logout = async () => {
 
     &:focus {
       outline: none;
-    }
-
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
-
-      &.hover-effect {
-        cursor: pointer;
-        transition: background 0.3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.025);
-        }
-      }
     }
 
     .avatar-container {
