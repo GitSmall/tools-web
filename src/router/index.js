@@ -75,13 +75,11 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore();
-  console.log("userStore", userStore);
   NProgress.start();
   // 设置页面标题
   document.title = getPageTitle(to.meta.title);
   // 通过token判断用户是否登录
   const hasToken = getToken();
-  console.log("hasToken", hasToken);
   if (hasToken) {
     if (to.path === "/login") {
       // 如果已登录，重定向到主页
@@ -90,17 +88,14 @@ router.beforeEach(async (to, _from, next) => {
     } else {
       // 判断用户是否已拉取完user_info信息
       const userInfo = getStorageUser();
-      console.log("--", userInfo);
-      if (userInfo && userInfo.name) {
+      if (userInfo && userInfo.username) {
         next();
       } else {
         try {
-          console.log("获取");
           // 获取用户信息
           await userStore.getInfo();
           next();
         } catch (error) {
-          console.log("获取失败");
           // 删除token并重定向到登录页面
           userStore.logout();
           next(`/login?redirect=${to.path}`);
@@ -127,7 +122,7 @@ router.afterEach(() => {
 
 router.onError((error, to) => {
   NProgress.done();
-  console.log("error", error);
+  console.error(error);
   const errors = ["Failed to fetch dynamically imported module"];
   if (errors.some((e) => error.message.includes(e))) {
     console.log("to", to);
