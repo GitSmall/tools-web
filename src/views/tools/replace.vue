@@ -47,19 +47,6 @@
               placeholder="请输入PDF名称当前列"
             ></el-input>
           </el-col>
-          <el-col :span="6">
-            <el-popover placement="right" :width="400">
-              <template #reference>
-                <i-ep-questionFilled
-                  class="mt-[7px] ml-[10px]"
-                ></i-ep-questionFilled>
-              </template>
-              <p class="pb-[10px]">
-                Excel中条形码数据列的标题名称。例如下图中的<b>Tracking</b>
-              </p>
-              <img src="../../assets/example.png" class="w-[400px]" />
-            </el-popover>
-          </el-col>
         </el-row>
       </el-form-item>
       <el-form-item label="PDF名称目标列" prop="targetColumn">
@@ -69,19 +56,6 @@
               v-model="ruleForm.targetColumn"
               placeholder="请输入PDF名称目标列"
             ></el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-popover placement="right" :width="400">
-              <template #reference>
-                <i-ep-questionFilled
-                  class="mt-[7px] ml-[10px]"
-                ></i-ep-questionFilled>
-              </template>
-              <p class="pb-[10px]">
-                Excel中条形码数据列的标题名称。例如下图中的<b>Tracking</b>
-              </p>
-              <img src="../../assets/example.png" class="w-[400px]" />
-            </el-popover>
           </el-col>
         </el-row>
       </el-form-item>
