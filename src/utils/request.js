@@ -81,9 +81,12 @@ service.interceptors.response.use(
         console.log("data", data);
       }
       if (data.code !== 200) {
-        if (data.code === 1002 || data.code === 1010) {
+        if (data.code === 401) {
           ElMessage.error({
-            message: data.message || "服务器异常",
+            message:
+              data.errors.length > 0
+                ? data.errors[0]
+                : data.message || "request occur Error",
             duration: 3 * 1000,
           });
           setTimeout(() => {
