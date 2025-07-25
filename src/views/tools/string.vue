@@ -52,7 +52,6 @@
           v-else
           ref="inputRes"
           class="res-input"
-          disabled
           v-model="res"
           type="textarea"
         ></el-input>
@@ -89,12 +88,12 @@ const handleInput = (value) => {
 // 专门处理粘贴事件（可选，确保粘贴时也能正确替换）
 const handlePaste = (e) => {
   // 阻止默认粘贴行为
-  e.preventDefault();
-  // 获取剪贴板数据
-  const clipboardData = e.clipboardData || window.clipboardData;
-  const pastedText = clipboardData.getData("text/plain");
-  // 替换连续空格并赋值
-  textarea.value = pastedText.replace(/\s+/g, "\n");
+  // e.preventDefault();
+  // // 获取剪贴板数据
+  // const clipboardData = e.clipboardData || window.clipboardData;
+  // const pastedText = clipboardData.getData("text/plain");
+  // // 替换连续空格并赋值
+  // textarea.value = textarea.value.replace(/\s+/g, "\n");
 };
 
 const copy = async () => {
