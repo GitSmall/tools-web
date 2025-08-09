@@ -44,6 +44,8 @@ const classObj = computed(() => {
     height: calc(100vh - 50px - 30px);
     gap: 15px;
     .sidebar-container {
+      display: flex;
+      flex-direction: column;
       width: 240px;
       height: 100%;
       flex-shrink: 0;

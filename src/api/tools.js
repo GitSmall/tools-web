@@ -31,3 +31,12 @@ export const createByText = (params) =>
 // 上传zip，修改其中PDF名称，并返回zip
 export const replacePdf = (params) =>
   requestData.base("/replacePdf/processZip", POST, params, false, true);
+// 备份面单
+export const backup4pxParcel = (params) =>
+  requestData.base("/backup/4px", POST, params);
+// 校验是否备份
+export const backup4pxParcelValidate = (params) =>
+  requestData.base("/backup/validate", POST, params);
+// 备份记录
+export const backup4pxParcelPage = (params) =>
+  requestData.base("/backup/page", POST, params);

@@ -181,10 +181,10 @@ const fileChange = (file) => {
   ) {
     return;
   } else {
-    if (fileList.value.length < 3) {
+    if (fileList.value.length < 4) {
       fileList.value.push(file);
     } else {
-      ElMessage.warning("最多支持同时上传3个文件");
+      ElMessage.warning("最多支持同时上传4个文件");
     }
   }
 };
@@ -260,26 +260,30 @@ const generateUUID = () => {
 
 const checkStatus = async (taskIdValue) => {
   const response = await thumbUploadTask(taskIdValue);
-  const { status, results: dataRes, progress, error } = response.data;
-  percentage.value = progress;
-  if (status === "completed") {
-    setTimeout(() => {
+  try {
+    const { status, results: dataRes, progress, error } = response.data;
+    percentage.value = progress;
+    if (status === "completed") {
+      setTimeout(() => {
+        loading.value = false;
+        fileList.value = [];
+        taskId.value = "";
+        uploadProgress.value = null;
+        const { excelUrl, results } = dataRes;
+        excelLink.value = excelUrl;
+        tableData.value = results;
+      }, 1000);
+    } else if (status === "failed") {
+      console.error("上传失败:", error);
+      ElMessage.error("上传失败: " + error);
       loading.value = false;
       fileList.value = [];
       taskId.value = "";
       uploadProgress.value = null;
-      const { excelUrl, results } = dataRes;
-      excelLink.value = excelUrl;
-      tableData.value = results;
-    }, 1000);
-  } else if (status === "failed") {
-    console.error("上传失败:", error);
-    ElMessage.error("上传失败: " + error);
-    loading.value = false;
-    fileList.value = [];
-    taskId.value = "";
-    uploadProgress.value = null;
-  } else {
+    } else {
+      setTimeout(() => checkStatus(taskIdValue), 5000);
+    }
+  } catch (error) {
     setTimeout(() => checkStatus(taskIdValue), 5000);
   }
 };

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { signIn, userInfo } from "@/api/login";
 import {
   getToken,
+  getStorageUser,
   setStorageUser,
   setToken,
   removeToken,
@@ -12,7 +13,7 @@ export const useUserStore = defineStore("user", {
   // 定义状态
   state: () => ({
     token: getToken() || "",
-    info: {},
+    info: getStorageUser(),
   }),
 
   // 定义派生状态

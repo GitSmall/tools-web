@@ -42,6 +42,19 @@
           </p>
         </div>
       </div>
+      <div class="desktop-card">
+        <img src="~@/assets/home/desk5.jpg" style="width: 100%; height: 100%" />
+        <div class="img-title !text-[#666]">4PX面单备份</div>
+        <div
+          class="desktop-card__content"
+          @click="jumpRoute('/tools/4px-backup')"
+        >
+          <p class="desktop-card__title">4PX面单备份</p>
+          <p class="desktop-card__description">
+            备份某个ERP用户下线上处理中的4PX面单
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -64,15 +77,16 @@ const jumpRoute = (path) => {
 }
 .desktop-main-mid {
   display: flex;
-  gap: 30px;
+  flex-wrap: wrap;
   width: 100%;
   height: 200px;
 }
 
 .desktop-card {
   position: relative;
-  width: 25%;
+  width: calc(25% - 30px);
   height: 170px;
+  margin: 15px;
   border-radius: 10px;
   display: flex;
   align-items: center;

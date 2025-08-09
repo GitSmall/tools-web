@@ -58,8 +58,39 @@ const routes = [
         component: () => import("@/views/tools/replace.vue"),
         meta: { title: "文件名替换", icon: "rename" },
       },
+      {
+        path: "4px-backup",
+        name: "Backup4px",
+        component: () => import("@/views/tools/4pxBackup.vue"),
+        meta: { title: "4PX面单备份", icon: "rename", isAdmin: true },
+      },
     ],
   },
+  // {
+  //   path: "/feedback",
+  //   component: Layout,
+  //   hidden: true,
+  //   children: [
+  //     {
+  //       path: "",
+  //       name: "Feedback",
+  //       component: () => import("@/views/feedback/index.vue"),
+  //       meta: { title: "意见反馈" },
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: "/feedback",
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: "",
+  //       name: "Feedback",
+  //       component: () => import("@/views/feedback/index.vue"),
+  //       meta: { title: "意见反馈", icon: "dashboard", idAdmin: true },
+  //     },
+  //   ],
+  // },
   {
     path: "/404",
     component: () => import("@/views/404.vue"),

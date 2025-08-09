@@ -8,7 +8,7 @@
           <div
             v-for="(it, index) in texts"
             :class="{ name: it.name, title: it.title }"
-            :style="{ animationDelay: index + 1 + 's' }"
+            :style="{ animationDelay: index * 0.5 + 's' }"
           >
             {{ it.text }}
           </div>
@@ -259,10 +259,8 @@ const init = () => {
     .map((it) => {
       return { text: it };
     });
-  console.log(textsData);
   if (from.length > 9) {
     const splitData = from.split("《");
-    console.log(splitData);
     splitData.forEach((it, index) => {
       if (index === 0) {
         textsData.push({ text: it, name: true });
@@ -286,17 +284,14 @@ const setFormType = (type) => {
 };
 const confirm = async () => {
   const valid = await loginFormRef.value.validate();
-  console.log(valid, !valid);
   if (!valid) {
     return;
   }
-  console.log("1");
   loading.value = true;
   const { login, password } = loginForm.value;
   userStore
     .login({ login, password })
     .then(() => {
-      console.log("-----");
       router.push({ path: redirect.value || "/" });
     })
     .finally(() => {
@@ -308,11 +303,9 @@ const register = async () => {
   if (!valid) {
     return;
   }
-  console.log("1");
   loading.value = true;
   signUp(registerForm.value)
     .then((res) => {
-      console.log("res", res);
       if (res.code == 200) {
         ElMessage.success("注册成功，请登录");
         setTimeout(() => {

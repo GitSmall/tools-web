@@ -21,11 +21,17 @@
         />
       </el-menu>
     </el-scrollbar>
+    <!-- <div class="btn-container">
+      <el-button :icon="Edit" size="small" @click="router.push('/feedback')">{{
+        isCollapse ? "" : "意见&建议"
+      }}</el-button>
+    </div> -->
   </div>
 </template>
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { Edit } from "@element-plus/icons-vue";
 import sidebarItem from "./sidebarItem.vue";
 import { useAppStore } from "@/store/app";
 
@@ -58,5 +64,13 @@ onMounted(() => {
   width: 200px;
   min-height: 400px;
   text-align: left;
+}
+.btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  flex-shrink: 0;
+  border-top: 1px solid #eee;
 }
 </style>
