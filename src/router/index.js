@@ -69,6 +69,7 @@ const routes = [
         name: "WeighingPlan",
         component: () => import("@/views/tools/weighingPlan.vue"),
         meta: { title: "称重计划", icon: "rename", isAdmin: true },
+        hidden: true,
       },
     ],
   },

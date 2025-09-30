@@ -60,7 +60,7 @@
         <div class="img-title !text-[#666]">货箱称重计划</div>
         <div
           class="desktop-card__content"
-          @click="jumpRoute('/tools/weighingPlan')"
+          @click="jumpRoute('/tools/weighingPlan', true)"
         >
           <p class="desktop-card__title">货箱称重计划</p>
           <p class="desktop-card__description">货箱重量及箱规体积记录</p>
@@ -72,8 +72,16 @@
 
 <script setup>
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/store/user";
 const router = useRouter();
-const jumpRoute = (path) => {
+const userStore = useUserStore();
+const jumpRoute = (path, isValidAdmin) => {
+  if (isValidAdmin) {
+    if (userStore.info.role != 100) {
+      ElMessage.warning("权限不足");
+      return;
+    }
+  }
   router.push({ path });
 };
 </script>
