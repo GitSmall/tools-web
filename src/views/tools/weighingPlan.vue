@@ -83,7 +83,7 @@ import {
   weighingPlanDelete,
 } from "@/api/tools";
 import Pagination from "@/components/Pagination/index.vue";
-import { downloadByBlob } from "@/utils/download";
+import { downloadByBlobExcel } from "@/utils/download";
 import CreatePlan from "./components/createPlan.vue";
 import ReadPlan from "./components/readPlan.vue";
 
@@ -119,7 +119,7 @@ const viewPlan = (row, type) => {
 const downloadFile = (id, count) => {
   if (count == 0) return ElMessage.warning("货箱数量为0，没有可下载的文件");
   weighingPlanDown(id).then((res) => {
-    downloadByBlob(res, true);
+    downloadByBlobExcel(res, true);
   });
 };
 
