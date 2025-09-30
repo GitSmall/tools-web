@@ -181,10 +181,10 @@ const fileChange = (file) => {
   ) {
     return;
   } else {
-    if (fileList.value.length < 4) {
+    if (fileList.value.length < 10) {
       fileList.value.push(file);
     } else {
-      ElMessage.warning("最多支持同时上传4个文件");
+      ElMessage.warning("最多支持同时上传10个文件");
     }
   }
 };

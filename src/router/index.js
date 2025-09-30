@@ -64,6 +64,12 @@ const routes = [
         component: () => import("@/views/tools/4pxBackup.vue"),
         meta: { title: "4PX面单备份", icon: "rename", isAdmin: true },
       },
+      {
+        path: "weighingPlan",
+        name: "WeighingPlan",
+        component: () => import("@/views/tools/weighingPlan.vue"),
+        meta: { title: "称重计划", icon: "rename", isAdmin: true },
+      },
     ],
   },
   // {

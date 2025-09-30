@@ -55,6 +55,17 @@
           </p>
         </div>
       </div>
+      <div class="desktop-card">
+        <img src="~@/assets/home/desk6.jpg" style="width: 100%; height: 100%" />
+        <div class="img-title !text-[#666]">货箱称重计划</div>
+        <div
+          class="desktop-card__content"
+          @click="jumpRoute('/tools/weighingPlan')"
+        >
+          <p class="desktop-card__title">货箱称重计划</p>
+          <p class="desktop-card__description">货箱重量及箱规体积记录</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

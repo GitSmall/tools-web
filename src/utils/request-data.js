@@ -41,3 +41,4 @@ export const RequestData = {
 export const getUrl = (uri) => request.defaults.baseURL + uri;
 export const GET = "get";
 export const POST = "post";
+export const DELETE = "delete";
