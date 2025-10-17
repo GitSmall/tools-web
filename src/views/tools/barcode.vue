@@ -13,6 +13,12 @@
           <el-radio :value="2" border>文本</el-radio>
         </el-radio-group>
       </el-form-item>
+      <el-form-item label="尺寸" prop="size">
+        <el-radio-group v-model="ruleForm.size">
+          <el-radio :value="1" border>自适应</el-radio>
+          <el-radio :value="2" border>A4</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item v-if="ruleForm.type == 1" label="附件">
         <el-upload
           ref="uploadRef"
@@ -105,6 +111,7 @@ import { createByExcel, createByText } from "@/api/tools";
 import { downloadByBlob } from "@/utils/download";
 const ruleForm = reactive({
   type: 1,
+  size: 1,
   file: null,
   name: "Tracking",
   chunkSize: 500,
@@ -146,13 +153,14 @@ const quickCreate = async () => {
     return;
   }
   console.log("---");
-  const { type, file, name, text, chunkSize } = ruleForm;
+  const { type, size, file, name, text, chunkSize } = ruleForm;
   if (type == 1) {
     if (!file) {
       return ElMessage.warning("请上传文件");
     }
     const params = new FormData();
     params.append("file", file);
+    params.append("size", size);
     params.append("name", name);
     params.append("chunkSize", chunkSize || 500);
     loading.value = true;
@@ -169,7 +177,7 @@ const quickCreate = async () => {
   } else if (type == 2) {
     console.log(text);
     loading.value = true;
-    createByText({ text })
+    createByText({ text, size })
       .then((res) => {
         console.log(res);
         if (res.status == 200 && res.data) {
