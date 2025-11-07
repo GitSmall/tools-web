@@ -31,7 +31,6 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Edit } from "@element-plus/icons-vue";
 import sidebarItem from "./sidebarItem.vue";
 import { useAppStore } from "@/store/app";
 

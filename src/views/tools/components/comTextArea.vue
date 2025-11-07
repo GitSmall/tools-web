@@ -8,6 +8,27 @@
         @click="insertVariable(item.value)"
         >{{ item.label }}</el-tag
       >
+      <el-dropdown v-if="ruleList.length" @command="handleCommand">
+        <span
+          class="el-dropdown-link text-12px flex items-center cursor-pointer"
+        >
+          选择
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item
+              v-for="item in props.ruleList"
+              :key="item"
+              :command="item"
+            >
+              {{ item }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
     <div
       ref="editorRef"
@@ -53,7 +74,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from "vue";
-import { Search } from "@element-plus/icons-vue";
+import { ArrowDown } from "@element-plus/icons-vue";
 
 const props = defineProps({
   modelValue: {
@@ -68,6 +89,10 @@ const props = defineProps({
     type: Number,
     default: 200,
   },
+  ruleList: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -81,15 +106,19 @@ let lastSelection = undefined;
  * @param {*} varName 变量名
  * @return {*} 创建的span元素
  */
-const createVarElement = (varName) => {
+const createVarElement = (varName, useVar = true) => {
   const span = document.createElement("span");
   span.className = "variable";
   span.contentEditable = "false"; // 不可编辑
   span.dataset.var = varName;
-  span.textContent = `\${${varName}}`;
+  span.textContent = useVar ? `\${${varName}}` : varName;
   return span;
 };
 
+const handleCommand = (command) => {
+  editorRef.value.innerHTML = "";
+  insertVariable(command, false);
+};
 /**
  * 保存当前光标位置（专为插入变量按钮点击设计）
  */
@@ -120,7 +149,7 @@ const saveSelection = () => {
  * @param {*} varName 变量名
  * @return {*} 无
  */
-const insertVariable = (varName) => {
+const insertVariable = (varName, useVar = true) => {
   if (!varName) return;
 
   // 恢复选区前先确保编辑器聚焦
@@ -137,7 +166,7 @@ const insertVariable = (varName) => {
   }
 
   // 插入变量元素
-  const varElement = createVarElement(varName);
+  const varElement = createVarElement(varName, useVar);
   const range = selection.getRangeAt(0);
   range.insertNode(varElement);
 

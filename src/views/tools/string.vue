@@ -31,10 +31,20 @@
         <ComTextArea
           v-model="smsContent"
           :variableList="variableList"
+          :ruleList="rules"
         ></ComTextArea>
-        <el-button type="primary" :icon="Switch" @click="startConvert"
-          >开始转换</el-button
-        >
+        <div class="flex justify-center items-center gap-20px">
+          <el-button
+            v-if="smsContent"
+            type="primary"
+            plain
+            :icon="DocumentAdd"
+            @click="saveRule"
+          ></el-button>
+          <el-button type="primary" :icon="Switch" @click="startConvert"
+            >开始转换</el-button
+          >
+        </div>
       </div>
     </el-card>
     <el-card class="flex-1 h-full">
@@ -62,7 +72,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { Switch } from "@element-plus/icons-vue";
+import { Switch, DocumentAdd } from "@element-plus/icons-vue";
 import ComTextArea from "./components/comTextArea.vue";
 import { ElMessage } from "element-plus";
 const textarea = ref("");
@@ -72,6 +82,8 @@ const variableList = ref([
   //   { label: "全部文本", value: "section" },
 ]);
 const res = ref("");
+const rules = ref([]);
+rules.value = JSON.parse(localStorage.getItem("smsContent") || "[]");
 
 const lines = computed(() => {
   if (textarea.value.trim()) {
@@ -109,6 +121,18 @@ const copy = async () => {
     ElMessage.error("复制失败，请手动复制");
     console.error("复制失败:", err);
   }
+};
+
+const saveRule = () => {
+  const arr = JSON.parse(localStorage.getItem("smsContent") || "[]");
+  if (arr.includes(smsContent.value)) {
+    ElMessage.warning("该规则已存在");
+    return;
+  }
+  arr.push(smsContent.value);
+  localStorage.setItem("smsContent", JSON.stringify(arr));
+  rules.value = arr;
+  ElMessage.success("规则已保存");
 };
 
 const startConvert = () => {
